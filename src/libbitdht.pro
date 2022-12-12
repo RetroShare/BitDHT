@@ -1,6 +1,6 @@
 # RetroShare main qmake build script
 #
-# Copyright (C) 2004-2019, Retroshare Team <contact@retroshare.cc>
+# Copyright (C) 2004-2022, Retroshare Team <contact@retroshare.cc>
 #
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU Lesser General Public License as published by the
@@ -44,7 +44,7 @@ linux-g++-64 {
 }
 
 unix {
-	data_files.path = "$${DATA_DIR}"
+    data_files.path = "$${RS_DATA_DIR}"
 	data_files.files = bitdht/bdboot.txt
 	INSTALLS += data_files
 }
