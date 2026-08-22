@@ -19,11 +19,14 @@
 # ------------------------------------------------------------------------ */
 
 target_sources(${PROJECT_NAME} PRIVATE
-  udpbitdht.cc
+  PUBLIC FILE_SET HEADERS FILES
   udpbitdht.h
-  udplayer.cc
   udplayer.h
   udpproxylayer.h
-  udpstack.cc
   udpstack.h
+
+  PRIVATE
+  udpbitdht.cc
+  udplayer.cc
+  udpstack.cc
 )

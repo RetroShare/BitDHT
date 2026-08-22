@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------ *\
-# src/bitdht/CMakeLists.txt
+# mk/cmake/bitdht-config.cmake.in
 # This file is part of BitDHT
 #
 # Copyright (C) 2026      David Bears <dbear4q@gmail.com>
@@ -18,41 +18,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------ */
 
-target_sources(${PROJECT_NAME}
-  PUBLIC FILE_SET HEADERS FILES
-  bdaccount.h
-  bdconnection.h
-  bdfilter.h
-  bdfriendlist.h
-  bdhash.h
-  bdhistory.h
-  bdiface.h
-  bdmanager.h
-  bdmsgs.h
-  bdnode.h
-  bdobj.h
-  bdpeer.h
-  bdquery.h
-  bdquerymgr.h
-  bdstddht.h
-  bdstore.h
-  bencode.h
+@PACKAGE_INIT@
 
-  PRIVATE
-  bdaccount.cc
-  bdconnection.cc
-  bdfilter.cc
-  bdfriendlist.cc
-  bdhash.cc
-  bdhistory.cc
-  bdmanager.cc
-  bdmsgs.cc
-  bdnode.cc
-  bdobj.cc
-  bdpeer.cc
-  bdquery.cc
-  bdquerymgr.cc
-  bdstddht.cc
-  bdstore.cc
-  bencode.c
-)
+include("${CMAKE_CURRENT_LIST_DIR}/bitdht-targets.cmake")
+
+set_and_check(BD_BOOT_FILE "@PACKAGE_BD_INSTALL_BOOT_FILE@")
+
+check_required_components("${CMAKE_FIND_PACKAGE_NAME}")

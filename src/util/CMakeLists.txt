@@ -19,16 +19,19 @@
 # ------------------------------------------------------------------------ */
 
 target_sources(${PROJECT_NAME} PRIVATE
-  bdbloom.cc
+  PUBLIC FILE_SET HEADERS FILES
   bdbloom.h
-  bdfile.cc
   bdfile.h
-  bdnet.cc
   bdnet.h
-  bdrandom.cc
   bdrandom.h
-  bdstring.cc
   bdstring.h
-  bdthreads.cc
   bdthreads.h
+
+  PRIVATE
+  bdbloom.cc
+  bdfile.cc
+  bdnet.cc
+  bdrandom.cc
+  bdstring.cc
+  bdthreads.cc
 )

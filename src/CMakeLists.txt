@@ -18,6 +18,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------ */
 
+target_sources(${PROJECT_NAME}
+	PUBLIC FILE_SET HEADERS
+	BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 add_subdirectory(bitdht)
 add_subdirectory(udp)
 add_subdirectory(util)
