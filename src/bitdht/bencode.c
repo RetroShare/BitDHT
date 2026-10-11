@@ -28,6 +28,8 @@
  * your changes into the public domain as well).
  */
 
+#include <errno.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h> /* malloc() realloc() free() strtoll() */
 #include <string.h> /* memset() */
@@ -54,17 +56,35 @@ static be_node *be_alloc(be_type type)
 	return ret;
 }
 
-static long long _be_decode_int(const char **data, long long *data_len)
+/* Bound the numeric field before strtoll(), which has no length argument.
+ * The delimiter is 'e' for integers and ':' for string lengths.
+ */
+static int _be_decode_int(const char **data, long long *data_len,
+                          long long *result, char delimiter)
 {
-	char *endp;
-	long long ret = strtoll(*data, &endp, 10);
-	*data_len -= (endp - *data);
-	*data = endp;
+	if (*data_len <= 0 || (unsigned long long)*data_len > SIZE_MAX)
+		return 0;
+	const char *end = (const char *)memchr(*data, delimiter, (size_t)*data_len);
+	if (!end || end == *data) return 0;
 
-#ifdef BE_DEBUG_DECODE
-	fprintf(stderr, "bencode::_be_decode_int(pnt: %p, rem: %lld) = %lld\n", *data, *data_len, ret);
-#endif
-	return ret;
+	/* The delimiter is in bounds, so length + 1 cannot overflow size_t. */
+	size_t length = end - *data;
+	char *number = (char *)malloc(length + 1);
+	if (!number) return 0;
+	memcpy(number, *data, length);
+	number[length] = '\0';
+
+	char *endp;
+	errno = 0;
+	long long value = strtoll(number, &endp, 10);
+	int valid = endp != number && errno != ERANGE && endp == number + length;
+	free(number);
+	if (!valid) return 0;
+
+	*result = value;
+	*data = end;
+	*data_len -= length;
+	return 1;
 }
 
 long long be_str_len(be_node *node)
@@ -80,7 +100,8 @@ static char *_be_decode_str(const char **data, long long *data_len)
 #ifdef BE_DEBUG_DECODE 
 	fprintf(stderr, "bencode::_be_decode_str(pnt: %p, rem: %lld)\n", *data, *data_len);
 #endif
-	long long sllen = _be_decode_int(data, data_len);
+	long long sllen;
+	if (!_be_decode_int(data, data_len, &sllen, ':')) return NULL;
 	long slen = sllen;
 	unsigned long len;
 	char *ret = NULL;
@@ -156,7 +177,7 @@ static be_node *_be_decode(const char **data, long long *data_len)
 #endif
 	be_node *ret = NULL;
 
-	if (!*data_len)
+	if (*data_len <= 0)
 	{
 #ifdef BE_DEBUG_DECODE 
 		fprintf(stderr, "bencode::_be_decode() reject invalid datalen\n");
@@ -176,7 +197,7 @@ static be_node *_be_decode(const char **data, long long *data_len)
 
 			--(*data_len);
 			++(*data);
-			while (**data != 'e') {
+			while (*data_len > 0 && **data != 'e') {
 #ifdef BE_DEBUG_DECODE 
 			fprintf(stderr, "bencode::_be_decode() list get item (%d)\n", i);
 #endif
@@ -192,7 +213,9 @@ static be_node *_be_decode(const char **data, long long *data_len)
 					return NULL;
 				}
 				++i;
+				ret->val.l[i] = NULL;
 			}
+			if (*data_len <= 0) { be_free(ret); return NULL; }
 			--(*data_len);
 			++(*data);
 
@@ -218,7 +241,7 @@ static be_node *_be_decode(const char **data, long long *data_len)
 
 			--(*data_len);
 			++(*data);
-			while (**data != 'e') {
+			while (*data_len > 0 && **data != 'e') {
 #ifdef BE_DEBUG_DECODE 
 			fprintf(stderr, "bencode::_be_decode() dictionary get key (%d)\n", i);
 #endif
@@ -232,6 +255,9 @@ static be_node *_be_decode(const char **data, long long *data_len)
 													  // memory occurs if(ret->val.d[i].key == 0x0 && ret->val.d[i].val != NULL)
 													  // when calling be_free 8 lines below this point...
 
+				if (!ret->val.d[i].val && ret->val.d[i].key)
+					free(ret->val.d[i].key - sizeof(long long));
+
 				if ((ret->val.d[i].key == NULL) || (ret->val.d[i].val == NULL))
 				{
 					/* failed decode - kill decode */
@@ -243,6 +269,7 @@ static be_node *_be_decode(const char **data, long long *data_len)
 				}
 				++i;
 			}
+			if (*data_len <= 0) { be_free(ret); return NULL; }
 			--(*data_len);
 			++(*data);
 
@@ -266,8 +293,7 @@ static be_node *_be_decode(const char **data, long long *data_len)
 
 			--(*data_len);
 			++(*data);
-			ret->val.i = _be_decode_int(data, data_len);
-			if (**data != 'e')
+			if (!_be_decode_int(data, data_len, &ret->val.i, 'e') || **data != 'e')
 			{
 #ifdef BE_DEBUG_DECODE 
 				fprintf(stderr, "bencode::_be_decode() reject data != e - kill\n");
@@ -289,6 +315,7 @@ static be_node *_be_decode(const char **data, long long *data_len)
 #endif
 
 			ret->val.s = _be_decode_str(data, data_len);
+			if (!ret->val.s) { be_free(ret); return NULL; }
 
 			return ret;
 		}
@@ -307,6 +334,7 @@ static be_node *_be_decode(const char **data, long long *data_len)
 
 be_node *be_decoden(const char *data, long long len)
 {
+	if (!data || len <= 0) return NULL;
 	return _be_decode(&data, &len);
 }
 
@@ -332,7 +360,7 @@ void be_free(be_node *node)
 
 		case BE_LIST: {
 			unsigned int i;
-			for (i = 0; node->val.l[i]; ++i)
+			for (i = 0; node->val.l && node->val.l[i]; ++i)
 				be_free(node->val.l[i]);
 			free(node->val.l);
 			break;
@@ -340,7 +368,7 @@ void be_free(be_node *node)
 
 		case BE_DICT: {
 			unsigned int i;
-			for (i = 0; node->val.d[i].val; ++i) {
+			for (i = 0; node->val.d && node->val.d[i].val; ++i) {
 				_be_free_str(node->val.d[i].key);
 				be_free(node->val.d[i].val);
 			}
