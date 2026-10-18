@@ -28,7 +28,7 @@ cmake_minimum_required(VERSION 3.11...4.4)
 
 project(bitdht
 	VERSION 0.0.0
-	LANGUAGES CXX
+	LANGUAGES CXX C
 )
 
 include(GNUInstallDirs)
