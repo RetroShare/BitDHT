@@ -18,7 +18,7 @@
 # SPDX-FileCopyrightText: Retroshare Team <contact@retroshare.cc>
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
-!include("../../retroshare.pri"): error("Could not include file ../../retroshare.pri")
+!include("../../../retroshare.pri"): error("Could not include file ../../../retroshare.pri")
 
 TEMPLATE = lib
 CONFIG += staticlib
@@ -58,7 +58,7 @@ android-* {
 
 #################### Cross compilation for windows under Linux ####################
 
-win32-x-g++ {	
+win32-x-g++ {
 	OBJECTS_DIR = temp/win32xgcc/obj
 	# These have been replaced by _WIN32 && __MINGW32__
 	# DEFINES *= WINDOWS_SYS WIN32 WIN_CROSS_UBUNTU

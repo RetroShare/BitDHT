@@ -18,8 +18,8 @@
 # SPDX-FileCopyrightText: Retroshare Team <contact@retroshare.cc>
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
-DEPENDPATH *= $$system_path($$clean_path($${PWD}/../../libbitdht/src))
-INCLUDEPATH  *= $$system_path($$clean_path($${PWD}/../../libbitdht/src))
-LIBS *= -L$$system_path($$clean_path($${OUT_PWD}/../../libbitdht/src/lib/)) -lbitdht
+DEPENDPATH *= $$system_path($$clean_path($${PWD}/../../supportlibs/libbitdht/src))
+INCLUDEPATH  *= $$system_path($$clean_path($${PWD}/../../supportlibs/libbitdht/src))
+LIBS *= -L$$system_path($$clean_path($${OUT_PWD}/../../supportlibs/libbitdht/src/lib/)) -lbitdht
 
-!equals(TARGET, bitdht):PRE_TARGETDEPS *= $$system_path($$clean_path($${OUT_PWD}/../../libbitdht/src/lib/libbitdht.a))
+!equals(TARGET, bitdht):PRE_TARGETDEPS *= $$system_path($$clean_path($${OUT_PWD}/../../supportlibs/libbitdht/src/lib/libbitdht.a))
