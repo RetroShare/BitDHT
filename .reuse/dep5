@@ -3,5 +3,25 @@ Upstream-Name: RetroShare
 Upstream-Contact: RetroShare Team <contact@retroshare.cc>
 
 Files: *
+Copyright: 2004-2026, Retroshare Team <contact@retroshare.cc>
+License: AGPL-3.0-or-later
+
+Files: src/tests/*
+Copyright: 2010, Robert Fernie
+License: LGPL-3.0-only
+
+Files: src/example/*
+Copyright: 2009-2010, Robert Fernie
+License: LGPL-2.0-only
+
+Files: CMakeLists.txt
+       src/README.txt
 Copyright: 2004-2022, Retroshare Team <contact@retroshare.cc>
+           2021-2022, Gioacchino Mazzurco <gio@retroshare.cc>
+License: CC0-1.0
+Comment: build files and notes that carry their own SPDX tag.
+
+Files: src/libbitdht.pro
+       src/use_libbitdht.pri
+Copyright: 2004-2019, Retroshare Team <contact@retroshare.cc>
 License: LGPL-3.0-or-later
