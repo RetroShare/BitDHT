@@ -133,6 +133,7 @@ bdStore::reloadFromEmbed() {
 		peer.mLastRecvTime = 0;
 		store.push_back(peer);
 	}
+	return (int)i;
 #else
 	return 0;
 #endif

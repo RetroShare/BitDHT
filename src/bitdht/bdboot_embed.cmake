@@ -66,8 +66,6 @@ string(APPEND bdboot_embed.c
 	"#include <stddef.h>\n"
 	# "#include <sys/socket.h>\n"
 	"\n"
-	"struct sockaddr_in;\n"
-	"\n"
 )
 
 string(APPEND bdboot_embed.c

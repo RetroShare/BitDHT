@@ -20,9 +20,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 \* ------------------------------------------------------------------------- */
 
+#include <netinet/in.h>
 #include <stddef.h>
-
-struct sockaddr_in;
 
 extern const struct sockaddr_in bdboot_embed[];
 extern const size_t bdboot_embed_count;
