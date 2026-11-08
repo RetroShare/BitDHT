@@ -62,9 +62,14 @@ string(APPEND bdboot_embed.c
 
 # includes
 string(APPEND bdboot_embed.c
-	"#include <netinet/in.h>\n"
 	"#include <stddef.h>\n"
+	"\n"
+	"#if defined(_WIN32) || defined(__MINGW32__)\n"
+	"#include <winsock.h>\n"
+	"#else\n"
+	"#include <netinet/in.h>\n"
 	# "#include <sys/socket.h>\n"
+	"#endif\n"
 	"\n"
 )
 
@@ -97,7 +102,7 @@ foreach(location ${addresses})
 	string(APPEND bdboot_embed.c
 		"(struct sockaddr_in){"
 			".sin_family=AF_INET,"
-			".sin_addr=${addr_hex},"
+			".sin_addr=(struct in_addr){.s_addr=${addr_hex}},"
 			".sin_port=${port},"
 		"},\n"
 	)

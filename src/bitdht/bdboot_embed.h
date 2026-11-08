@@ -20,8 +20,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 \* ------------------------------------------------------------------------- */
 
-#include <netinet/in.h>
 #include <stddef.h>
+
+#if defined(_WIN32) || defined(__MINGW32__)
+#include <winsock.h>
+#else
+#include <netinet/in.h>
+#endif
 
 extern const struct sockaddr_in bdboot_embed[];
 extern const size_t bdboot_embed_count;
