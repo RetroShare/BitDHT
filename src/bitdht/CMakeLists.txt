@@ -78,10 +78,10 @@ if(BD_EMBED_BDBOOT)
 			${BD_BOOT_FILE}
 		COMMENT "Generating bdboot_embed.c"
 	)
-	add_custom_target(bdboot_embed.c
+	add_custom_target(bdboot_embed.c-target
 		DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/bdboot_embed.c
 	)
-	add_dependencies(${PROJECT_NAME} bdboot_embed.c)
+	add_dependencies(${PROJECT_NAME} bdboot_embed.c-target)
 
 	target_sources(${PROJECT_NAME}
 		${PRIVATE_FILESET_private_HEADERS_FILES}
