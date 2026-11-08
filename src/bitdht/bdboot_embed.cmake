@@ -21,7 +21,8 @@
 ## ------------------------------------------------------------------------- ##
 
 # 3.7 : if(VERSION_GREATER_EQUAL)
-cmake_minimum_required(VERSION 3.7...4.4)
+# 3.13: math(OUTPUT_FORMAT HEXADECIMAL)
+cmake_minimum_required(VERSION 3.13...4.4)
 
 function(inet_aton numbers_and_dots addr_out)
 	string(REPLACE "." ";" addr_comps ${numbers_and_dots})
