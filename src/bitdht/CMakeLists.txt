@@ -25,40 +25,69 @@
 cmake_minimum_required(VERSION 3.13...4.4)
 
 target_sources(${PROJECT_NAME}
-  ${PUBLIC_FILESET_HEADERS_FILES}
-  bdaccount.h
-  bdconnection.h
-  bdfilter.h
-  bdfriendlist.h
-  bdhash.h
-  bdhistory.h
-  bdiface.h
-  bdmanager.h
-  bdmsgs.h
-  bdnode.h
-  bdobj.h
-  bdpeer.h
-  bdquery.h
-  bdquerymgr.h
-  bdstddht.h
-  bdstore.h
-  bencode.h
+	${PUBLIC_FILESET_HEADERS_FILES}
+	bdaccount.h
+	bdconnection.h
+	bdfilter.h
+	bdfriendlist.h
+	bdhash.h
+	bdhistory.h
+	bdiface.h
+	bdmanager.h
+	bdmsgs.h
+	bdnode.h
+	bdobj.h
+	bdpeer.h
+	bdquery.h
+	bdquerymgr.h
+	bdstddht.h
+	bdstore.h
+	bencode.h
 
-  ${PRIVATE_FILESET_SOURCES_FILES}
-  bdaccount.cc
-  bdconnection.cc
-  bdfilter.cc
-  bdfriendlist.cc
-  bdhash.cc
-  bdhistory.cc
-  bdmanager.cc
-  bdmsgs.cc
-  bdnode.cc
-  bdobj.cc
-  bdpeer.cc
-  bdquery.cc
-  bdquerymgr.cc
-  bdstddht.cc
-  bdstore.cc
-  bencode.c
+	${PRIVATE_FILESET_SOURCES_FILES}
+	bdaccount.cc
+	bdconnection.cc
+	bdfilter.cc
+	bdfriendlist.cc
+	bdhash.cc
+	bdhistory.cc
+	bdmanager.cc
+	bdmsgs.cc
+	bdnode.cc
+	bdobj.cc
+	bdpeer.cc
+	bdquery.cc
+	bdquerymgr.cc
+	bdstddht.cc
+	bdstore.cc
+	bencode.c
 )
+
+if(BD_EMBED_BDBOOT)
+	target_compile_definitions(${PROJECT_NAME} PRIVATE BD_EMBED_BDBOOT)
+
+	add_custom_command(
+		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/bdboot_embed.c
+		COMMAND ${CMAKE_COMMAND}
+			-DBDBOOT_SOURCE=${BD_BOOT_FILE}
+			-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/bdboot_embed.c
+			-P ${CMAKE_CURRENT_SOURCE_DIR}/bdboot_embed.cmake
+			--
+		DEPENDS
+			${CMAKE_CURRENT_SOURCE_DIR}/bdboot_embed.cmake
+			${BD_BOOT_FILE}
+		COMMENT "Generating bdboot_embed.c"
+	)
+	add_custom_target(bdboot_embed.c
+		DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/bdboot_embed.c
+	)
+	add_dependencies(${PROJECT_NAME} bdboot_embed.c)
+
+	target_sources(${PROJECT_NAME}
+		${PRIVATE_FILESET_private_HEADERS_FILES}
+		bdboot_embed.h
+
+		${PRIVATE_FILESET_SOURCES_FILES}
+		${CMAKE_CURRENT_BINARY_DIR}/bdboot_embed.c
+	)
+endif()

@@ -37,6 +37,16 @@ string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 set(BD_INSTALL_DATADIR "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}")
 set(BD_INSTALL_INCLUDEDIR "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}")
 
+set(BD_EMBED_BDBOOT_DEFAULT FALSE)
+if(WIN32)
+	# Windows prefers self-contained libraries
+	set(BD_EMBED_BDBOOT_DEFAULT TRUE)
+endif()
+option(BD_EMBED_BDBOOT
+	"embed the bdboot file into the library"
+	${BD_EMBED_BDBOOT_DEFAULT}
+)
+
 
 ### Dependencies
 
