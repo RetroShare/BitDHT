@@ -67,27 +67,27 @@ if(BD_EMBED_BDBOOT)
 	target_compile_definitions(${PROJECT_NAME} PRIVATE BD_EMBED_BDBOOT)
 
 	add_custom_command(
-		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/bdboot_embed.c
+		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/bdboot_embed.cc
 		COMMAND ${CMAKE_COMMAND}
 			-DBDBOOT_SOURCE=${BD_BOOT_FILE}
-			-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/bdboot_embed.c
+			-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/bdboot_embed.cc
 			-P ${CMAKE_CURRENT_SOURCE_DIR}/bdboot_embed.cmake
 			--
 		DEPENDS
 			${CMAKE_CURRENT_SOURCE_DIR}/bdboot_embed.cmake
 			${BD_BOOT_FILE}
-		COMMENT "Generating bdboot_embed.c"
+		COMMENT "Generating bdboot_embed.cc"
 	)
-	add_custom_target(bdboot_embed.c-target
-		DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/bdboot_embed.c
+	add_custom_target(bdboot_embed.cc-target
+		DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/bdboot_embed.cc
 	)
-	add_dependencies(${PROJECT_NAME} bdboot_embed.c-target)
+	add_dependencies(${PROJECT_NAME} bdboot_embed.cc-target)
 
 	target_sources(${PROJECT_NAME}
 		${PRIVATE_FILESET_private_HEADERS_FILES}
-		bdboot_embed.h
+		bdboot_embed.hh
 
 		${PRIVATE_FILESET_SOURCES_FILES}
-		${CMAKE_CURRENT_BINARY_DIR}/bdboot_embed.c
+		${CMAKE_CURRENT_BINARY_DIR}/bdboot_embed.cc
 	)
 endif()

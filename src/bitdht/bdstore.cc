@@ -29,7 +29,7 @@
 #include <iostream>
 
 #ifdef BD_EMBED_BDBOOT
-#include "bitdht/bdboot_embed.h"
+#include "bitdht/bdboot_embed.hh"
 #endif
 
 //#define DEBUG_STORE 1
