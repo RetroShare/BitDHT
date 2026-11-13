@@ -4,6 +4,7 @@
  * BitDHT: An Flexible DHT library.                                            *
  *                                                                             *
  * Copyright 2011 by Robert Fernie <bitdht@lunamutt.com>                       *
+ * Copyright 2025      David Bears <dbear4q@gmail.com>                         *
  *                                                                             *
  * This program is free software: you can redistribute it and/or modify        *
  * it under the terms of the GNU Affero General Public License as              *
@@ -26,6 +27,10 @@
 
 #include <stdio.h>
 #include <iostream>
+
+#ifdef BD_EMBED_BDBOOT
+#include "bitdht/bdboot_embed.hh"
+#endif
 
 //#define DEBUG_STORE 1
 
@@ -59,7 +64,11 @@ int bdStore::reloadFromStore()
 	} else if(mStoreFileBak != "") { //Nothing loaded, try the backup file
 		return reloadFromStore(mStoreFileBak);
 	} else {
+		#ifdef BD_EMBED_BDBOOT
+		return reloadFromEmbed();
+		#else
 		return 0;
+		#endif
 	}
 }
 
@@ -73,7 +82,7 @@ int bdStore::reloadFromStore(std::string file)
 		fprintf(stderr, "Failed to Open File: %s ... No Peers\n", file.c_str());
 		return 0;
 	}
-		
+
 
 	char line[10240];
 	char addr_str[10240];
@@ -111,6 +120,25 @@ int bdStore::reloadFromStore(std::string file)
 
 }
 
+int
+bdStore::reloadFromEmbed() {
+#ifdef BD_EMBED_BDBOOT
+	clear();
+	size_t i;
+	for(i = 0; i < bdboot_embed_count; ++i) {
+		bdPeer peer;
+		bdZeroNodeId(&(peer.mPeerId.id));
+		peer.mPeerId.addr = bdboot_embed[i];
+		peer.mLastSendTime = 0;
+		peer.mLastRecvTime = 0;
+		store.push_back(peer);
+	}
+	return (int)i;
+#else
+	return 0;
+#endif
+}
+
 // This is a very ugly function!
 int 	bdStore::getPeer(bdPeer *peer)
 {
@@ -132,7 +160,7 @@ int 	bdStore::getPeer(bdPeer *peer)
 
 int     bdStore::filterIpList(const std::list<struct sockaddr_in> &filteredIPs)
 {
-	// Nasty O(n^2) iteration over 500 entries!!!. 
+	// Nasty O(n^2) iteration over 500 entries!!!.
 	// hope its not used to often.
 
 	std::list<struct sockaddr_in>::const_iterator it;
@@ -156,8 +184,8 @@ int     bdStore::filterIpList(const std::list<struct sockaddr_in> &filteredIPs)
 	}
 	return 1;
 }
-			
-		
+
+
 
 #define MAX_ENTRIES 500
 
@@ -234,7 +262,7 @@ void	bdStore::writeStore(std::string file)
 		fprintf(stderr, "bdStore::writeStore() FAILED to Open File\n");
 		return;
 	}
-	
+
 	std::list<bdPeer>::iterator it;
 	for(it = store.begin(); it != store.end(); it++)
 	{
@@ -264,6 +292,3 @@ void	bdStore::writeStore()
 #endif
 	return writeStore(mStoreFile);
 }
-
-
-

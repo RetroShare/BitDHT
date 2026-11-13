@@ -28,11 +28,30 @@
 #include <unistd.h>
 #include "bdfile.h"
 
-namespace librs { 
-	namespace util {
-		bool ConvertUtf8ToUtf16(const std::string& source, std::wstring& dest) ;
-	} 
+#ifdef WIN32
+static bool ConvertUtf8ToUtf16(const std::string& source, std::wstring& dest) {
+	if (source.empty()) {
+		dest.clear();
+		return true;
+	}
+
+	int nbChars = MultiByteToWideChar(CP_UTF8, 0, source.c_str(), -1, 0, 0);
+	if(nbChars == 0) {
+		return false;
+	}
+
+	wchar_t* utf16Name = new wchar_t[nbChars];
+	if( MultiByteToWideChar(CP_UTF8, 0, source.c_str(), -1, utf16Name, nbChars) == 0) {
+		delete[] utf16Name;
+		return false;
+	}
+
+	dest = utf16Name;
+	delete[] utf16Name;
+
+	return true;
 }
+#endif
 
 bool bdFile::renameFile(const std::string& from, const std::string& to)
 {
@@ -40,9 +59,9 @@ bool bdFile::renameFile(const std::string& from, const std::string& to)
 
 #ifdef WIN32
 	std::wstring f;
-	librs::util::ConvertUtf8ToUtf16(from, f);
+	ConvertUtf8ToUtf16(from, f);
 	std::wstring t;
-	librs::util::ConvertUtf8ToUtf16(to, t);
+	ConvertUtf8ToUtf16(to, t);
 
 	while (!MoveFileEx(f.c_str(), t.c_str(), MOVEFILE_REPLACE_EXISTING))
 #else
@@ -72,4 +91,3 @@ bool bdFile::renameFile(const std::string& from, const std::string& to)
 
 	return true ;
 }
-
